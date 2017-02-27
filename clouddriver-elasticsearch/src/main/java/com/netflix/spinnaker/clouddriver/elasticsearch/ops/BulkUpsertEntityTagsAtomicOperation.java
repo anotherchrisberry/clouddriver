@@ -57,38 +57,37 @@ public class BulkUpsertEntityTagsAtomicOperation implements AtomicOperation<Bulk
   }
 
   public BulkUpsertEntityTagsAtomicOperationResult operate(List priorOutputs) {
-    BulkUpsertEntityTagsAtomicOperationResult result = new BulkUpsertEntityTagsAtomicOperationResult();
-    List<EntityTags> entityTags = bulkUpsertEntityTagsDescription.entityTags;
-
-    addTagIdsIfMissing(entityTags, result);
-
-    mergeTags(bulkUpsertEntityTagsDescription);
-
-    Date now = new Date();
-
-    Lists.partition(entityTags, 50).forEach(tags -> {
-      getTask().updateStatus(BASE_PHASE, "Retrieving current entity tags");
-      Map<String, EntityTags> existingTags = retrieveExistingTags(tags);
-
-      getTask().updateStatus(BASE_PHASE, "Merging existing tags and metadata");
-      tags.forEach(tag -> mergeExistingTagsAndMetadata(now, existingTags.get(tag.getId()), tag, bulkUpsertEntityTagsDescription.isPartial));
-
-      getTask().updateStatus(BASE_PHASE, "Performing batch update to durable tagging service");
-      Map<String, EntityTags> durableTags = front50Service.batchUpdate(new ArrayList<>(tags))
-        .stream().collect(Collectors.toMap(EntityTags::getId, Function.identity()));
-
-      getTask().updateStatus(BASE_PHASE, "Pushing tags to Elastic Search");
-      updateMetadataFromDurableTagsAndIndex(tags, durableTags, result);
-      result.upserted.addAll(tags);
-    });
-    return result;
+    return null;
+//    BulkUpsertEntityTagsAtomicOperationResult result = new BulkUpsertEntityTagsAtomicOperationResult();
+//    List<EntityTags> entityTags = bulkUpsertEntityTagsDescription.entityTags;
+//
+//    addTagIdsIfMissing(entityTags, result);
+//
+//    mergeTags(bulkUpsertEntityTagsDescription);
+//
+//    Date now = new Date();
+//
+//    getTask().updateStatus(BASE_PHASE, "Retrieving current entity tags");
+//    Map<String, EntityTags> existingTags = retrieveExistingTags(entityTags);
+//
+//    getTask().updateStatus(BASE_PHASE, "Merging existing tags and metadata");
+//    entityTags.forEach(tag -> mergeExistingTagsAndMetadata(now, existingTags.get(tag.getId()), tag, bulkUpsertEntityTagsDescription.isPartial));
+//
+//    getTask().updateStatus(BASE_PHASE, "Performing batch update to durable tagging service");
+//    Map<String, EntityTags> durableTags = front50Service.batchUpdate(new ArrayList<>(entityTags))
+//      .stream().collect(Collectors.toMap(EntityTags::getId, Function.identity()));
+//
+//    getTask().updateStatus(BASE_PHASE, "Pushing tags to Elastic Search");
+//    updateMetadataFromDurableTagsAndIndex(entityTags, durableTags, result);
+//    result.upserted.addAll(entityTags);
+//    return result;
   }
 
-  private Map<String, EntityTags> retrieveExistingTags(List<EntityTags> entityTags) {
-    return front50Service.getAllEntityTagsById(
-      entityTags.stream().map(EntityTags::getId).collect(Collectors.toList())
-    ).stream().collect(Collectors.toMap(EntityTags::getId, Function.identity()));
-  }
+//  private Map<String, EntityTags> retrieveExistingTags(List<EntityTags> entityTags) {
+//    return front50Service.bulkFetch(
+//      entityTags.stream().map(EntityTags::getId).collect(Collectors.toList())
+//    ).stream().collect(Collectors.toMap(EntityTags::getId, Function.identity()));
+//  }
 
   private void addTagIdsIfMissing(List<EntityTags> entityTags, BulkUpsertEntityTagsAtomicOperationResult result) {
     Collection<EntityTags> failed = new ArrayList<>();

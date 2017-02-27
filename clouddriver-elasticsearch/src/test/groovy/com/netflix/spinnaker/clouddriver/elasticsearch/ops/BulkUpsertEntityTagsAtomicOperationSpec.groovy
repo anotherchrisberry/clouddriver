@@ -63,11 +63,11 @@ class BulkUpsertEntityTagsAtomicOperationSpec extends Specification {
 
     then:
     1000 * accountCredentialsProvider.getAll() >> { return [testCredentials] }
-    20 * front50Service.getAllEntityTagsById(_) >> []
-    20 * front50Service.batchUpdate(_) >> {
+    1 * front50Service.bulkFetch(_) >> []
+    1 * front50Service.batchUpdate(_) >> {
       description.entityTags.findResults { new EntityTags(id: it.id, lastModified: 123, lastModifiedBy: "unknown")}
     }
-    20 * entityTagsProvider.bulkIndex(_)
+    1 * entityTagsProvider.bulkIndex(_)
     1000 * entityTagsProvider.verifyIndex(_)
   }
 
@@ -100,7 +100,7 @@ class BulkUpsertEntityTagsAtomicOperationSpec extends Specification {
     description.entityTags.size() == 2
     description.entityTags[0].tags.size() == 3
     4 * accountCredentialsProvider.getAll() >> { return [testCredentials] }
-    1 * front50Service.getAllEntityTagsById(_) >> []
+    1 * front50Service.bulkFetch(_) >> []
     1 * front50Service.batchUpdate(_) >> {
       description.entityTags.findResults { new EntityTags(id: it.id, lastModified: 123, lastModifiedBy: "unknown")}
     }
@@ -131,7 +131,7 @@ class BulkUpsertEntityTagsAtomicOperationSpec extends Specification {
     1 * front50Service.batchUpdate(_) >> {
       [new EntityTags(id: "aws:servergroup:orca-v001:100:us-east-1", lastModified: 123, lastModifiedBy: "unknown")]
     }
-    1 * front50Service.getAllEntityTagsById(_) >> []
+    1 * front50Service.bulkFetch(_) >> []
     1 * entityTagsProvider.bulkIndex(description.entityTags)
     1 * entityTagsProvider.verifyIndex(tag)
   }
@@ -214,7 +214,7 @@ class BulkUpsertEntityTagsAtomicOperationSpec extends Specification {
     result.upserted.size() == 3
     description.entityTags.size() == 3
     4 * accountCredentialsProvider.getAll() >> { return [testCredentials] }
-    1 * front50Service.getAllEntityTagsById(_) >> []
+    1 * front50Service.bulkFetch(_) >> []
     1 * front50Service.batchUpdate(_) >> {
       description.entityTags.findResults { new EntityTags(id: it.id, lastModified: 123, lastModifiedBy: "unknown")}
     }
