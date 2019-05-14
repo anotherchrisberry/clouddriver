@@ -29,6 +29,7 @@ class AmazonInstance implements Instance, Serializable {
   String name
   Long launchTime
   List<Map<String, Object>> health = []
+  Boolean isHealthy
   final String providerType = AmazonCloudProvider.ID
   final String cloudProvider = AmazonCloudProvider.ID
 
